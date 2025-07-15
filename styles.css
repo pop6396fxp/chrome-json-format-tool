@@ -294,6 +294,11 @@ body {
     padding: 1px 0;
 }
 
+.json-property .json-line {
+    display: inline-block;
+    position: relative;
+}
+
 .json-array-item {
     display: block;
     position: relative;
