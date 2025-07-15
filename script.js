@@ -96,9 +96,21 @@ class JSONFormatter {
             html += `<div class="json-children" id="${id}">`;
             
             keys.forEach((k, index) => {
+                const value = obj[k];
+                const isComplexValue = (Array.isArray(value) && value.length > 0) || 
+                                     (typeof value === 'object' && value !== null && Object.keys(value).length > 0);
+                
                 html += `${nextIndent}<div class="json-property">`;
                 html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                html += this.createFormattedHTML(obj[k], level + 1, k);
+                
+                if (isComplexValue) {
+                    // For complex values (non-empty arrays/objects), add line break before value
+                    html += '\n' + this.createFormattedHTML(value, level + 1, k);
+                } else {
+                    // For simple values, keep on same line
+                    html += this.createFormattedHTML(value, level + 1, k);
+                }
+                
                 if (index < keys.length - 1) {
                     html += ',';
                 }
