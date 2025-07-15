@@ -74,6 +74,7 @@ body {
     box-shadow: var(--shadow-lg);
     padding: 24px;
     backdrop-filter: blur(10px);
+    overflow: hidden;
 }
 
 .input-section,
@@ -81,6 +82,8 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .section-header {
@@ -185,6 +188,8 @@ body {
     background: var(--gray-50);
     transition: border-color 0.2s ease;
     min-height: 500px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #jsonInput:focus {
@@ -206,6 +211,8 @@ body {
     overflow: auto;
     min-height: 500px;
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .placeholder {

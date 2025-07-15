@@ -21,10 +21,6 @@ class JSONFormatter {
         this.clearBtn.addEventListener('click', () => this.clearAll());
         this.copyBtn.addEventListener('click', () => this.copyResult());
         
-        this.jsonInput.addEventListener('input', () => this.autoFormat());
-        this.jsonInput.addEventListener('paste', () => {
-            setTimeout(() => this.autoFormat(), 100);
-        });
     }
 
     formatJSON() {
@@ -70,7 +66,7 @@ class JSONFormatter {
             
             const id = this.generateId();
             let html = `<span class="json-line">`;
-            html += `<button class="json-toggle expanded" onclick="window.jsonFormatter.toggleCollapse('${id}')"></button>`;
+            html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
             html += `<span class="json-bracket">[</span>\n`;
             html += `<div class="json-children" id="${id}">`;
             
@@ -94,7 +90,7 @@ class JSONFormatter {
             
             const id = this.generateId();
             let html = `<span class="json-line">`;
-            html += `<button class="json-toggle expanded" onclick="window.jsonFormatter.toggleCollapse('${id}')"></button>`;
+            html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
             html += `<span class="json-bracket">{</span>\n`;
             html += `<div class="json-children" id="${id}">`;
             
@@ -173,24 +169,21 @@ class JSONFormatter {
         }
     }
 
-    autoFormat() {
-        const input = this.jsonInput.value.trim();
-        if (!input) {
-            this.clearOutput();
-            return;
-        }
-
-        try {
-            const parsed = JSON.parse(input);
-            const formatted = this.createFormattedHTML(parsed);
-            this.displayResult(formatted);
-        } catch (error) {
-            // 静默失败，不显示错误
-        }
-    }
 
     displayResult(html) {
         this.jsonOutput.innerHTML = `<div class="json-tree fade-in">${html}</div>`;
+        this.bindToggleEvents();
+    }
+
+    bindToggleEvents() {
+        const toggles = this.jsonOutput.querySelectorAll('.json-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = toggle.getAttribute('data-target');
+                this.toggleCollapse(targetId);
+            });
+        });
     }
 
     displayPlainResult(text) {
@@ -331,7 +324,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         if (!window.jsonFormatter.jsonInput.value.trim()) {
             window.jsonFormatter.jsonInput.value = JSON.stringify(sampleJSON, null, 2);
-            window.jsonFormatter.autoFormat();
         }
     }, 500);
 });
