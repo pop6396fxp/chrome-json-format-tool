@@ -283,6 +283,8 @@ body {
 .json-line {
     display: block;
     position: relative;
+    line-height: 1.8;
+    padding: 1px 0;
 }
 
 .json-toggle {
@@ -309,12 +311,12 @@ body {
     transform: scale(1.1);
 }
 
-.json-toggle.collapsed::before {
-    content: '+';
-}
-
 .json-toggle.expanded::before {
     content: '−';
+}
+
+.json-toggle.collapsed::before {
+    content: '+';
 }
 
 .json-children {

@@ -71,11 +71,12 @@ class JSONFormatter {
             html += `<div class="json-children" id="${id}">`;
             
             obj.forEach((item, index) => {
-                html += `${nextIndent}${this.createFormattedHTML(item, level + 1)}`;
+                html += `${nextIndent}<span class="json-line">`;
+                html += this.createFormattedHTML(item, level + 1);
                 if (index < obj.length - 1) {
                     html += ',';
                 }
-                html += '\n';
+                html += '</span>\n';
             });
             
             html += `</div>${indent}<span class="json-bracket">]</span></span>`;
@@ -95,12 +96,12 @@ class JSONFormatter {
             html += `<div class="json-children" id="${id}">`;
             
             keys.forEach((k, index) => {
-                html += `${nextIndent}<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                html += `${nextIndent}<span class="json-line"><span class="json-key">"${this.escapeHTML(k)}"</span>: `;
                 html += this.createFormattedHTML(obj[k], level + 1, k);
                 if (index < keys.length - 1) {
                     html += ',';
                 }
-                html += '\n';
+                html += '</span>\n';
             });
             
             html += `</div>${indent}<span class="json-bracket">}</span></span>`;
@@ -112,7 +113,7 @@ class JSONFormatter {
 
     toggleCollapse(id) {
         const element = document.getElementById(id);
-        const toggle = element.previousElementSibling;
+        const toggle = element.parentElement.querySelector('.json-toggle');
         
         if (element.classList.contains('collapsed')) {
             element.classList.remove('collapsed');
@@ -146,7 +147,6 @@ class JSONFormatter {
             this.jsonInput.value = unescaped;
             this.showSuccess('转义字符已成功去除');
             
-            setTimeout(() => this.autoFormat(), 100);
         } catch (error) {
             this.showError(`去除转义失败: ${error.message}`);
         }
