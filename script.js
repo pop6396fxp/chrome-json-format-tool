@@ -113,16 +113,31 @@ class JSONFormatter {
 
     toggleCollapse(id) {
         const element = document.getElementById(id);
+        if (!element) {
+            console.error('Element not found for id:', id);
+            return;
+        }
+        
         const toggle = element.parentElement.querySelector('.json-toggle');
+        console.log('Element found:', element);
+        console.log('Parent element:', element.parentElement);
+        console.log('Toggle found:', toggle);
+        
+        if (!toggle) {
+            console.error('Toggle button not found for id:', id);
+            return;
+        }
         
         if (element.classList.contains('collapsed')) {
             element.classList.remove('collapsed');
             toggle.classList.remove('collapsed');
             toggle.classList.add('expanded');
+            console.log('Expanded element for id:', id);
         } else {
             element.classList.add('collapsed');
             toggle.classList.remove('expanded');
             toggle.classList.add('collapsed');
+            console.log('Collapsed element for id:', id);
         }
     }
 
@@ -180,7 +195,9 @@ class JSONFormatter {
         toggles.forEach(toggle => {
             toggle.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const targetId = toggle.getAttribute('data-target');
+                console.log('Toggle clicked for ID:', targetId);
                 this.toggleCollapse(targetId);
             });
         });
