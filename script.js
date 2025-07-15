@@ -67,19 +67,19 @@ class JSONFormatter {
             const id = this.generateId();
             let html = `<span class="json-line">`;
             html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
-            html += `<span class="json-bracket">[</span>\n`;
+            html += `<span class="json-bracket">[</span>`;
             html += `<div class="json-children" id="${id}">`;
             
             obj.forEach((item, index) => {
-                html += `${nextIndent}<div class="json-array-item">`;
+                html += `\n${nextIndent}<div class="json-array-item">`;
                 html += this.createFormattedHTML(item, level + 1);
                 if (index < obj.length - 1) {
                     html += ',';
                 }
-                html += '</div>\n';
+                html += '</div>';
             });
             
-            html += `</div>${indent}<span class="json-bracket">]</span></span>`;
+            html += `\n</div>${indent}<span class="json-bracket">]</span></span>`;
             return html;
         }
         
@@ -96,16 +96,31 @@ class JSONFormatter {
             html += `<div class="json-children" id="${id}">`;
             
             keys.forEach((k, index) => {
+                const value = obj[k];
+                const isArrayOrObject = Array.isArray(value) || (typeof value === 'object' && value !== null && Object.keys(value).length > 0);
+                
                 html += `${nextIndent}<div class="json-property">`;
-                html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
                 
-                const value = this.createFormattedHTML(obj[k], level + 1, k);
-                
-                // Check if value is a complex object/array that generates multiline content
-                if (value.includes('<div class="json-children"')) {
-                    html += `\n${value}`;
+                if (isArrayOrObject) {
+                    // For arrays/objects, put toggle button before the key
+                    const valueHTML = this.createFormattedHTML(value, level + 1, k);
+                    const toggleMatch = valueHTML.match(/<button class="json-toggle[^>]*data-target="([^"]*)"[^>]*><\/button>/);
+                    
+                    if (toggleMatch) {
+                        const targetId = toggleMatch[1];
+                        html += `<button class="json-toggle expanded" data-target="${targetId}"></button>`;
+                        html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                        // Remove the button from the value HTML and add it
+                        const cleanValueHTML = valueHTML.replace(/<button class="json-toggle[^>]*><\/button>/, '');
+                        html += cleanValueHTML;
+                    } else {
+                        html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                        html += valueHTML;
+                    }
                 } else {
-                    html += value;
+                    // For simple values, no button needed
+                    html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                    html += this.createFormattedHTML(value, level + 1, k);
                 }
                 
                 if (index < keys.length - 1) {
