@@ -71,12 +71,12 @@ class JSONFormatter {
             html += `<div class="json-children" id="${id}">`;
             
             obj.forEach((item, index) => {
-                html += `${nextIndent}<span class="json-line">`;
+                html += `${nextIndent}<div class="json-array-item">`;
                 html += this.createFormattedHTML(item, level + 1);
                 if (index < obj.length - 1) {
                     html += ',';
                 }
-                html += '</span>\n';
+                html += '</div>\n';
             });
             
             html += `</div>${indent}<span class="json-bracket">]</span></span>`;
@@ -96,12 +96,22 @@ class JSONFormatter {
             html += `<div class="json-children" id="${id}">`;
             
             keys.forEach((k, index) => {
-                html += `${nextIndent}<span class="json-line"><span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                html += this.createFormattedHTML(obj[k], level + 1, k);
+                html += `${nextIndent}<div class="json-property">`;
+                html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                
+                const value = this.createFormattedHTML(obj[k], level + 1, k);
+                
+                // Check if value is a complex object/array that generates multiline content
+                if (value.includes('<div class="json-children"')) {
+                    html += `\n${value}`;
+                } else {
+                    html += value;
+                }
+                
                 if (index < keys.length - 1) {
                     html += ',';
                 }
-                html += '</span>\n';
+                html += '</div>\n';
             });
             
             html += `</div>${indent}<span class="json-bracket">}</span></span>`;
@@ -114,17 +124,11 @@ class JSONFormatter {
     toggleCollapse(id) {
         const element = document.getElementById(id);
         if (!element) {
-            console.error('Element not found for id:', id);
             return;
         }
         
         const toggle = element.parentElement.querySelector('.json-toggle');
-        console.log('Element found:', element);
-        console.log('Parent element:', element.parentElement);
-        console.log('Toggle found:', toggle);
-        
         if (!toggle) {
-            console.error('Toggle button not found for id:', id);
             return;
         }
         
@@ -132,12 +136,10 @@ class JSONFormatter {
             element.classList.remove('collapsed');
             toggle.classList.remove('collapsed');
             toggle.classList.add('expanded');
-            console.log('Expanded element for id:', id);
         } else {
             element.classList.add('collapsed');
             toggle.classList.remove('expanded');
             toggle.classList.add('collapsed');
-            console.log('Collapsed element for id:', id);
         }
     }
 
@@ -197,7 +199,6 @@ class JSONFormatter {
                 e.preventDefault();
                 e.stopPropagation();
                 const targetId = toggle.getAttribute('data-target');
-                console.log('Toggle clicked for ID:', targetId);
                 this.toggleCollapse(targetId);
             });
         });

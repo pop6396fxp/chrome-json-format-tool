@@ -287,6 +287,20 @@ body {
     padding: 1px 0;
 }
 
+.json-property {
+    display: block;
+    position: relative;
+    line-height: 1.8;
+    padding: 1px 0;
+}
+
+.json-array-item {
+    display: block;
+    position: relative;
+    line-height: 1.8;
+    padding: 1px 0;
+}
+
 .json-toggle {
     position: absolute;
     left: -20px;
