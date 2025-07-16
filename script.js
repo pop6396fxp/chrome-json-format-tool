@@ -32,14 +32,14 @@ class JSONFormatter {
 
         try {
             const parsed = JSON.parse(input);
-            const formatted = this.createFormattedHTML(parsed);
+            const formatted = this.createFormattedHTML(parsed, 0, null, false);
             this.displayResult(formatted);
         } catch (error) {
             this.showError(`JSON格式错误: ${error.message}`);
         }
     }
 
-    createFormattedHTML(obj, level = 0, key = null) {
+    createFormattedHTML(obj, level = 0, key = null, parentHandlesToggle = false) {
         const indent = '  '.repeat(level);
         const nextIndent = '  '.repeat(level + 1);
         
@@ -64,29 +64,19 @@ class JSONFormatter {
                 return '<span class="json-bracket">[]</span>';
             }
             
-            // For deeply nested arrays, don't add toggle button, let parent handle it
-            if (level > 1) {
-                let html = `<span class="json-bracket">[</span>`;
-                obj.forEach((item, index) => {
-                    html += `\n${nextIndent}<div class="json-array-item">`;
-                    html += this.createFormattedHTML(item, level + 1);
-                    if (index < obj.length - 1) {
-                        html += ',';
-                    }
-                    html += '</div>';
-                });
-                html += `\n${indent}<span class="json-bracket">]</span>`;
-                return html;
-            } else {
+            // Don't add toggle button for nested values, let parent handle it
+            if (parentHandlesToggle || level === 0) {
                 const id = this.generateId();
                 let html = `<span class="json-line">`;
-                html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
+                if (!parentHandlesToggle) {
+                    html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
+                }
                 html += `<span class="json-bracket">[</span>`;
                 html += `<div class="json-children" id="${id}">`;
                 
                 obj.forEach((item, index) => {
                     html += `\n${nextIndent}<div class="json-array-item">`;
-                    html += this.createFormattedHTML(item, level + 1);
+                    html += this.createFormattedHTML(item, level + 1, null, false);
                     if (index < obj.length - 1) {
                         html += ',';
                     }
@@ -94,6 +84,18 @@ class JSONFormatter {
                 });
                 
                 html += `\n${indent}</div><span class="json-bracket">]</span></span>`;
+                return html;
+            } else {
+                let html = `<span class="json-bracket">[</span>`;
+                obj.forEach((item, index) => {
+                    html += `\n${nextIndent}<div class="json-array-item">`;
+                    html += this.createFormattedHTML(item, level + 1, null, true);
+                    if (index < obj.length - 1) {
+                        html += ',';
+                    }
+                    html += '</div>';
+                });
+                html += `\n${indent}<span class="json-bracket">]</span>`;
                 return html;
             }
         }
@@ -104,8 +106,57 @@ class JSONFormatter {
                 return '<span class="json-bracket">{}</span>';
             }
             
-            // For deeply nested objects, don't add toggle button, let parent handle it
-            if (level > 1) {
+            // Don't add toggle button for nested values, let parent handle it
+            if (parentHandlesToggle || level === 0) {
+                const id = this.generateId();
+                let html = `<span class="json-line">`;
+                if (!parentHandlesToggle) {
+                    html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
+                }
+                html += `<span class="json-bracket">{</span>`;
+                html += `<div class="json-children" id="${id}">`;
+                
+                keys.forEach((k, index) => {
+                    const value = obj[k];
+                    const isComplexValue = (Array.isArray(value) && value.length > 0) || 
+                                         (typeof value === 'object' && value !== null && Object.keys(value).length > 0);
+                    
+                    html += `\n${nextIndent}<div class="json-property">`;
+                    
+                    if (isComplexValue) {
+                        const childId = this.generateId();
+                        html += `<button class="json-toggle expanded" data-target="${childId}"></button>`;
+                        html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                        
+                        if (Array.isArray(value)) {
+                            html += `<span class="json-bracket">[</span>`;
+                            html += `<div class="json-children" id="${childId}">`;
+                            value.forEach((item, itemIndex) => {
+                                html += `\n${nextIndent}  <div class="json-array-item">`;
+                                html += this.createFormattedHTML(item, level + 2, null, false);
+                                if (itemIndex < value.length - 1) {
+                                    html += ',';
+                                }
+                                html += '</div>';
+                            });
+                            html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
+                        } else {
+                            html += this.createFormattedHTML(value, level + 1, k, false);
+                        }
+                    } else {
+                        html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
+                        html += this.createFormattedHTML(value, level + 1, k, true);
+                    }
+                    
+                    if (index < keys.length - 1) {
+                        html += ',';
+                    }
+                    html += '</div>';
+                });
+                
+                html += `\n${indent}</div><span class="json-bracket">}</span></span>`;
+                return html;
+            } else {
                 let html = `<span class="json-bracket">{</span>`;
                 keys.forEach((k, index) => {
                     const value = obj[k];
@@ -124,7 +175,7 @@ class JSONFormatter {
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
                                 html += `\n${nextIndent}  <div class="json-array-item">`;
-                                html += this.createFormattedHTML(item, level + 2);
+                                html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
@@ -132,11 +183,11 @@ class JSONFormatter {
                             });
                             html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
                         } else {
-                            html += this.createFormattedHTML(value, level + 1, k);
+                            html += this.createFormattedHTML(value, level + 1, k, false);
                         }
                     } else {
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                        html += this.createFormattedHTML(value, level + 1, k);
+                        html += this.createFormattedHTML(value, level + 1, k, true);
                     }
                     
                     if (index < keys.length - 1) {
@@ -145,55 +196,6 @@ class JSONFormatter {
                     html += '</div>';
                 });
                 html += `\n${indent}<span class="json-bracket">}</span>`;
-                return html;
-            } else {
-                const id = this.generateId();
-                let html = `<span class="json-line">`;
-                html += `<button class="json-toggle expanded" data-target="${id}"></button>`;
-                html += `<span class="json-bracket">{</span>`;
-                html += `<div class="json-children" id="${id}">`;
-                
-                keys.forEach((k, index) => {
-                    const value = obj[k];
-                    const isComplexValue = (Array.isArray(value) && value.length > 0) || 
-                                         (typeof value === 'object' && value !== null && Object.keys(value).length > 0);
-                    
-                    html += `\n${nextIndent}<div class="json-property">`;
-                    
-                    if (isComplexValue) {
-                        // For complex values, add toggle button before key and handle structure
-                        const childId = this.generateId();
-                        html += `<button class="json-toggle expanded" data-target="${childId}"></button>`;
-                        html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                        
-                        if (Array.isArray(value)) {
-                            html += `<span class="json-bracket">[</span>`;
-                            html += `<div class="json-children" id="${childId}">`;
-                            value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}  <div class="json-array-item">`;
-                                html += this.createFormattedHTML(item, level + 2);
-                                if (itemIndex < value.length - 1) {
-                                    html += ',';
-                                }
-                                html += '</div>';
-                            });
-                            html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
-                        } else {
-                            html += this.createFormattedHTML(value, level + 1, k);
-                        }
-                    } else {
-                        // For simple values, no button needed
-                        html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                        html += this.createFormattedHTML(value, level + 1, k);
-                    }
-                    
-                    if (index < keys.length - 1) {
-                        html += ',';
-                    }
-                    html += '</div>';
-                });
-                
-                html += `\n${indent}</div><span class="json-bracket">}</span></span>`;
                 return html;
             }
         }
