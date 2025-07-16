@@ -132,14 +132,14 @@ class JSONFormatter {
                             html += `<span class="json-bracket">[</span>`;
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}  <div class="json-array-item">`;
+                                html += `\n${nextIndent}    <div class="json-array-item">`;
                                 html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
                                 html += '</div>';
                             });
-                            html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
+                            html += `\n${nextIndent}  </div><span class="json-bracket">]</span>`;
                         } else {
                             html += `<span class="json-bracket">{</span>`;
                             html += `<div class="json-children" id="${childId}">`;
@@ -199,14 +199,14 @@ class JSONFormatter {
                             html += `<span class="json-bracket">[</span>`;
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}  <div class="json-array-item">`;
+                                html += `\n${nextIndent}    <div class="json-array-item">`;
                                 html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
                                 html += '</div>';
                             });
-                            html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
+                            html += `\n${nextIndent}  </div><span class="json-bracket">]</span>`;
                         } else {
                             html += `<span class="json-bracket">{</span>`;
                             html += `<div class="json-children" id="${childId}">`;
