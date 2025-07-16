@@ -40,8 +40,8 @@ class JSONFormatter {
     }
 
     createFormattedHTML(obj, level = 0, key = null, parentHandlesToggle = false) {
-        const indent = '  '.repeat(level);
-        const nextIndent = '  '.repeat(level + 1);
+        const indent = '    '.repeat(level);
+        const nextIndent = '    '.repeat(level + 1);
         
         if (obj === null) {
             return `<span class="json-null">null</span>`;
