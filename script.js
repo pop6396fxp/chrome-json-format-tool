@@ -141,7 +141,32 @@ class JSONFormatter {
                             });
                             html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
                         } else {
-                            html += this.createFormattedHTML(value, level + 1, k, false);
+                            html += `<span class="json-bracket">{</span>`;
+                            html += `<div class="json-children" id="${childId}">`;
+                            const objKeys = Object.keys(value);
+                            objKeys.forEach((objKey, objIndex) => {
+                                const objValue = value[objKey];
+                                const isNestedComplex = (Array.isArray(objValue) && objValue.length > 0) || 
+                                                     (typeof objValue === 'object' && objValue !== null && Object.keys(objValue).length > 0);
+                                
+                                html += `\n${nextIndent}  <div class="json-property">`;
+                                
+                                if (isNestedComplex) {
+                                    const nestedId = this.generateId();
+                                    html += `<button class="json-toggle expanded" data-target="${nestedId}"></button>`;
+                                    html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
+                                } else {
+                                    html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
+                                }
+                                
+                                if (objIndex < objKeys.length - 1) {
+                                    html += ',';
+                                }
+                                html += '</div>';
+                            });
+                            html += `\n${nextIndent}</div><span class="json-bracket">}</span>`;
                         }
                     } else {
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
@@ -183,7 +208,32 @@ class JSONFormatter {
                             });
                             html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
                         } else {
-                            html += this.createFormattedHTML(value, level + 1, k, false);
+                            html += `<span class="json-bracket">{</span>`;
+                            html += `<div class="json-children" id="${childId}">`;
+                            const objKeys = Object.keys(value);
+                            objKeys.forEach((objKey, objIndex) => {
+                                const objValue = value[objKey];
+                                const isNestedComplex = (Array.isArray(objValue) && objValue.length > 0) || 
+                                                     (typeof objValue === 'object' && objValue !== null && Object.keys(objValue).length > 0);
+                                
+                                html += `\n${nextIndent}  <div class="json-property">`;
+                                
+                                if (isNestedComplex) {
+                                    const nestedId = this.generateId();
+                                    html += `<button class="json-toggle expanded" data-target="${nestedId}"></button>`;
+                                    html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
+                                } else {
+                                    html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
+                                }
+                                
+                                if (objIndex < objKeys.length - 1) {
+                                    html += ',';
+                                }
+                                html += '</div>';
+                            });
+                            html += `\n${nextIndent}</div><span class="json-bracket">}</span>`;
                         }
                     } else {
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
