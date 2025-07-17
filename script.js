@@ -135,7 +135,7 @@ class JSONFormatter {
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
                                 html += `\n${nextIndent}<div class="json-array-item">`;
-                                html += this.createFormattedHTML(item, level + 2, null, true);
+                                html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
@@ -157,10 +157,10 @@ class JSONFormatter {
                                     const nestedId = this.generateId();
                                     html += `<button class="json-toggle expanded" data-target="${nestedId}"></button>`;
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
                                 } else {
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
                                 }
                                 
                                 if (objIndex < objKeys.length - 1) {
@@ -202,7 +202,7 @@ class JSONFormatter {
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
                                 html += `\n${nextIndent}<div class="json-array-item">`;
-                                html += this.createFormattedHTML(item, level + 2, null, true);
+                                html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
@@ -224,10 +224,10 @@ class JSONFormatter {
                                     const nestedId = this.generateId();
                                     html += `<button class="json-toggle expanded" data-target="${nestedId}"></button>`;
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
                                 } else {
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
                                 }
                                 
                                 if (objIndex < objKeys.length - 1) {
