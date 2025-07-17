@@ -86,7 +86,9 @@ class JSONFormatter {
                 html += `\n${indent}</div><span class="json-bracket">]</span></span>`;
                 return html;
             } else {
+                const id = this.generateId();
                 let html = `<span class="json-bracket">[</span>`;
+                html += `<div class="json-children" id="${id}">`;
                 obj.forEach((item, index) => {
                     html += `\n${nextIndent}<div class="json-array-item">`;
                     html += this.createFormattedHTML(item, level + 1, null, true);
@@ -95,7 +97,7 @@ class JSONFormatter {
                     }
                     html += '</div>';
                 });
-                html += `\n${indent}<span class="json-bracket">]</span>`;
+                html += `\n${indent}</div><span class="json-bracket">]</span>`;
                 return html;
             }
         }
@@ -132,14 +134,14 @@ class JSONFormatter {
                             html += `<span class="json-bracket">[</span>`;
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}    <div class="json-array-item">`;
+                                html += `\n${nextIndent}<div class="json-array-item">`;
                                 html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
                                 html += '</div>';
                             });
-                            html += `\n${nextIndent}  </div><span class="json-bracket">]</span>`;
+                            html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
                         } else {
                             html += `<span class="json-bracket">{</span>`;
                             html += `<div class="json-children" id="${childId}">`;
@@ -199,14 +201,14 @@ class JSONFormatter {
                             html += `<span class="json-bracket">[</span>`;
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}    <div class="json-array-item">`;
+                                html += `\n${nextIndent}<div class="json-array-item">`;
                                 html += this.createFormattedHTML(item, level + 2, null, false);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
                                 html += '</div>';
                             });
-                            html += `\n${nextIndent}  </div><span class="json-bracket">]</span>`;
+                            html += `\n${nextIndent}</div><span class="json-bracket">]</span>`;
                         } else {
                             html += `<span class="json-bracket">{</span>`;
                             html += `<div class="json-children" id="${childId}">`;
