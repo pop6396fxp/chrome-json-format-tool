@@ -120,22 +120,25 @@ class JSONFormatter {
                 
                 keys.forEach((k, index) => {
                     const value = obj[k];
-                    const isComplexValue = (Array.isArray(value) && value.length > 0) || 
+                    const isComplexValue = (Array.isArray(value) && value.length > 0) ||
                                          (typeof value === 'object' && value !== null && Object.keys(value).length > 0);
-                    
+
+                    console.log(`Processing key: ${k}, isComplexValue: ${isComplexValue}, value:`, value);
+
                     html += `\n${nextIndent}<div class="json-property">`;
-                    
+
                     if (isComplexValue) {
                         const childId = this.generateId();
+                        console.log(`Creating toggle for ${k} with id: ${childId}`);
                         html += `<button class="json-toggle expanded" data-target="${childId}"></button>`;
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                        
+
                         if (Array.isArray(value)) {
                             html += `<span class="json-bracket">[</span>`;
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}<div class="json-array-item">`;
-                                html += this.createFormattedHTML(item, level + 2, null, false);
+                                html += `\n${nextIndent}  <div class="json-array-item">`;
+                                html += this.createFormattedHTML(item, level + 2, null, true);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
@@ -148,21 +151,50 @@ class JSONFormatter {
                             const objKeys = Object.keys(value);
                             objKeys.forEach((objKey, objIndex) => {
                                 const objValue = value[objKey];
-                                const isNestedComplex = (Array.isArray(objValue) && objValue.length > 0) || 
+                                const isNestedComplex = (Array.isArray(objValue) && objValue.length > 0) ||
                                                      (typeof objValue === 'object' && objValue !== null && Object.keys(objValue).length > 0);
-                                
+
                                 html += `\n${nextIndent}  <div class="json-property">`;
-                                
+
                                 if (isNestedComplex) {
                                     const nestedId = this.generateId();
+                                    console.log(`Creating nested toggle for ${objKey} with id: ${nestedId}`);
                                     html += `<button class="json-toggle expanded" data-target="${nestedId}"></button>`;
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
+
+                                    if (Array.isArray(objValue)) {
+                                        html += `<span class="json-bracket">[</span>`;
+                                        html += `<div class="json-children" id="${nestedId}">`;
+                                        objValue.forEach((item, itemIndex) => {
+                                            html += `\n${nextIndent}    <div class="json-array-item">`;
+                                            html += this.createFormattedHTML(item, level + 3, null, true);
+                                            if (itemIndex < objValue.length - 1) {
+                                                html += ',';
+                                            }
+                                            html += '</div>';
+                                        });
+                                        html += `\n${nextIndent}  </div><span class="json-bracket">]</span>`;
+                                    } else {
+                                        html += `<span class="json-bracket">{</span>`;
+                                        html += `<div class="json-children" id="${nestedId}">`;
+                                        const nestedObjKeys = Object.keys(objValue);
+                                        nestedObjKeys.forEach((nestedKey, nestedIndex) => {
+                                            const nestedValue = objValue[nestedKey];
+                                            html += `\n${nextIndent}    <div class="json-property">`;
+                                            html += `<span class="json-key">"${this.escapeHTML(nestedKey)}"</span>: `;
+                                            html += this.createFormattedHTML(nestedValue, level + 3, nestedKey, true);
+                                            if (nestedIndex < nestedObjKeys.length - 1) {
+                                                html += ',';
+                                            }
+                                            html += '</div>';
+                                        });
+                                        html += `\n${nextIndent}  </div><span class="json-bracket">}</span>`;
+                                    }
                                 } else {
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
                                 }
-                                
+
                                 if (objIndex < objKeys.length - 1) {
                                     html += ',';
                                 }
@@ -174,7 +206,7 @@ class JSONFormatter {
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
                         html += this.createFormattedHTML(value, level + 1, k, true);
                     }
-                    
+
                     if (index < keys.length - 1) {
                         html += ',';
                     }
@@ -187,22 +219,22 @@ class JSONFormatter {
                 let html = `<span class="json-bracket">{</span>`;
                 keys.forEach((k, index) => {
                     const value = obj[k];
-                    const isComplexValue = (Array.isArray(value) && value.length > 0) || 
+                    const isComplexValue = (Array.isArray(value) && value.length > 0) ||
                                          (typeof value === 'object' && value !== null && Object.keys(value).length > 0);
-                    
+
                     html += `\n${nextIndent}<div class="json-property">`;
-                    
+
                     if (isComplexValue) {
                         const childId = this.generateId();
                         html += `<button class="json-toggle expanded" data-target="${childId}"></button>`;
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
-                        
+
                         if (Array.isArray(value)) {
                             html += `<span class="json-bracket">[</span>`;
                             html += `<div class="json-children" id="${childId}">`;
                             value.forEach((item, itemIndex) => {
-                                html += `\n${nextIndent}<div class="json-array-item">`;
-                                html += this.createFormattedHTML(item, level + 2, null, false);
+                                html += `\n${nextIndent}  <div class="json-array-item">`;
+                                html += this.createFormattedHTML(item, level + 2, null, true);
                                 if (itemIndex < value.length - 1) {
                                     html += ',';
                                 }
@@ -215,21 +247,50 @@ class JSONFormatter {
                             const objKeys = Object.keys(value);
                             objKeys.forEach((objKey, objIndex) => {
                                 const objValue = value[objKey];
-                                const isNestedComplex = (Array.isArray(objValue) && objValue.length > 0) || 
+                                const isNestedComplex = (Array.isArray(objValue) && objValue.length > 0) ||
                                                      (typeof objValue === 'object' && objValue !== null && Object.keys(objValue).length > 0);
-                                
+
                                 html += `\n${nextIndent}  <div class="json-property">`;
-                                
+
                                 if (isNestedComplex) {
                                     const nestedId = this.generateId();
+                                    console.log(`Creating nested toggle for ${objKey} with id: ${nestedId}`);
                                     html += `<button class="json-toggle expanded" data-target="${nestedId}"></button>`;
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
+
+                                    if (Array.isArray(objValue)) {
+                                        html += `<span class="json-bracket">[</span>`;
+                                        html += `<div class="json-children" id="${nestedId}">`;
+                                        objValue.forEach((item, itemIndex) => {
+                                            html += `\n${nextIndent}    <div class="json-array-item">`;
+                                            html += this.createFormattedHTML(item, level + 3, null, true);
+                                            if (itemIndex < objValue.length - 1) {
+                                                html += ',';
+                                            }
+                                            html += '</div>';
+                                        });
+                                        html += `\n${nextIndent}  </div><span class="json-bracket">]</span>`;
+                                    } else {
+                                        html += `<span class="json-bracket">{</span>`;
+                                        html += `<div class="json-children" id="${nestedId}">`;
+                                        const nestedObjKeys = Object.keys(objValue);
+                                        nestedObjKeys.forEach((nestedKey, nestedIndex) => {
+                                            const nestedValue = objValue[nestedKey];
+                                            html += `\n${nextIndent}    <div class="json-property">`;
+                                            html += `<span class="json-key">"${this.escapeHTML(nestedKey)}"</span>: `;
+                                            html += this.createFormattedHTML(nestedValue, level + 3, nestedKey, true);
+                                            if (nestedIndex < nestedObjKeys.length - 1) {
+                                                html += ',';
+                                            }
+                                            html += '</div>';
+                                        });
+                                        html += `\n${nextIndent}  </div><span class="json-bracket">}</span>`;
+                                    }
                                 } else {
                                     html += `<span class="json-key">"${this.escapeHTML(objKey)}"</span>: `;
-                                    html += this.createFormattedHTML(objValue, level + 2, objKey, false);
+                                    html += this.createFormattedHTML(objValue, level + 2, objKey, true);
                                 }
-                                
+
                                 if (objIndex < objKeys.length - 1) {
                                     html += ',';
                                 }
@@ -241,7 +302,7 @@ class JSONFormatter {
                         html += `<span class="json-key">"${this.escapeHTML(k)}"</span>: `;
                         html += this.createFormattedHTML(value, level + 1, k, true);
                     }
-                    
+
                     if (index < keys.length - 1) {
                         html += ',';
                     }
@@ -256,24 +317,34 @@ class JSONFormatter {
     }
 
     toggleCollapse(id) {
+        console.log('toggleCollapse called with id:', id);
         const element = document.getElementById(id);
         if (!element) {
+            console.log('Element not found for id:', id);
             return;
         }
-        
-        const toggle = element.parentElement.querySelector('.json-toggle');
+        console.log('Found element:', element);
+
+        // 更精确地查找对应的toggle按钮
+        // 查找具有匹配data-target属性的按钮
+        const toggle = document.querySelector(`.json-toggle[data-target="${id}"]`);
         if (!toggle) {
+            console.log('Toggle button not found for id:', id);
+            console.log('Available toggles:', document.querySelectorAll('.json-toggle'));
             return;
         }
-        
+        console.log('Found toggle:', toggle);
+
         if (element.classList.contains('collapsed')) {
             element.classList.remove('collapsed');
             toggle.classList.remove('collapsed');
             toggle.classList.add('expanded');
+            console.log('Expanded');
         } else {
             element.classList.add('collapsed');
             toggle.classList.remove('expanded');
             toggle.classList.add('collapsed');
+            console.log('Collapsed');
         }
     }
 
